@@ -70,10 +70,10 @@ jobs:
       - uses: 8398a7/action-slack@v3
         with:
           status: custom
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
+          fields: message
           custom_payload: |
             {
-              text: "Build Report: ${{ github.repository }}",
+              text: "Pull request on: ${{ github.repository }}",
               attachments: [{
                 color: "good",
                 title: "Build Results",
@@ -81,6 +81,11 @@ jobs:
                   {
                     title: "Repository",
                     value: "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>",
+                    short: true
+                  },
+                  {
+                    title: "Message",
+                    value: "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|" + (process.env.AS_MESSAGE ? process.env.AS_MESSAGE.split('\n')[0] : "No message") + ">",
                     short: true
                   },
                   {
