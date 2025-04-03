@@ -72,6 +72,7 @@ jobs:
       - uses: 8398a7/action-slack@v3
         with:
           status: custom
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
               text: "Pull request is ready to review on `${{ github.repository }}`",
