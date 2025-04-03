@@ -33,6 +33,7 @@ jobs:
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           output: report-markdown
+
       - name: Add coverage comment
         uses: marocchino/sticky-pull-request-comment@v2
         with:
@@ -72,57 +73,45 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
-                  text: "Pull Request on ${{ github.repository }}",
-                  attachments: [{
-                          title: 'GitHub Actions',
-                          color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
-                          text: '${{ needs.test.result}}' === 'success' ? 'Success' : '${{ needs.test.result }}' === 'failure' ? 'Failure' : 'Warning',
-                          fields: [
-                              {
-                                  title: 'github.event.pull_request.url',
-                                  value: '${{ github.event.pull_request.url }}'
-                                  short: true,
-                              },
-                              {
-                                  title: 'needs.test.result',
-                                  value: '${{ needs.test.result }}'
-                                  short: true,
-                              },
-                              {
-                                  title: 'needs.test.outputs.duration',
-                                  value: '${{ needs.test.outputs.duration }}'
-                                  short: true,
-                              },
-                              {
-                                  title: 'github.event.pull_request.commits_url',
-                                  text: '${{ github.event.pull_request.commits_url }}'
-                                  short: true,
-                              },
-                              {
-                                  title: 'github.workflow_ref',
-                                  value: '${{ github.workflow_ref }}'
-                                  short: true,
-                              },
-                              {
-                                  title: 'github.event.pull_request.body',
-                                  value: '${{ github.event.pull_request.body }}'
-                                  short: true
-                              },
-                              {
-                                  title: 'github.event.pull_request.commits_url',
-                                  value: '${{ github.event.pull_request.commits_url }}',
-                                  short: true
-                              },
-                              {
-                                  title: 'github.event.pull_request.user.email',
-                                  value: '${{ github.event.pull_request.user.email }}',
-                                  short: true
-                              },
-                          ]
-                      }
-                  ]
-              }
+              "text": "Build Report: ${{ github.repository }}",
+              "attachments": [{
+                "color": "good",
+                "title": "Build Results",
+                "fields": [
+                  {
+                    "title": "Repository URL",
+                    "value": "${{ github.server_url }}/${{ github.repository }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Commit",
+                    "value": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Author",
+                    "value": "${{ github.actor }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Duration",
+                    "value": "${{ needs.test.outputs.duration }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Branch/Ref",
+                    "value": "${{ github.ref }}",
+                    "short": true
+                  },
+                  {
+                    "title": "Workflow URL",
+                    "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                    "short": true
+                  }
+                ],
+                "footer": "GitHub Actions · ${{ github.workflow }}"
+              }]
+            }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-        # Pick up events even if the job fails or is canceled.
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: always()
