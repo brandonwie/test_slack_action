@@ -24,6 +24,13 @@ jobs:
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           output: report-markdown
+      - name: Debug Coverage Output
+        run: |
+          echo "Coverage report type: $(typeof '${{ steps.coverage.outputs.report }}')"
+          echo "Coverage report length: ${#COVERAGE_REPORT}"
+          echo "First 100 chars: ${COVERAGE_REPORT:0:100}"
+        env:
+          COVERAGE_REPORT: ${{ steps.coverage.outputs.report }}
 
   slack:
     permissions:
@@ -47,11 +54,10 @@ jobs:
                   {
                     title: 'Result',
                     value: '${{needs.test.result}}'
-                  },
+                  }
                 ]
               }]
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        # Pick up events even if the job fails or is canceled.
         if: always()
