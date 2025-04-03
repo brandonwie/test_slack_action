@@ -69,15 +69,82 @@ jobs:
     needs: test
     steps:
       - uses: 8398a7/action-slack@v3
+        if: github.event_name == 'pull_request'
         with:
           status: custom
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
-              text: "Pull request is ready for review on `${{ github.repository }}`",
+              text: "Pull Request: " + process.env.AS_PULL_REQUEST,
               attachments: [{
-                color: "${{ needs.test.result }}" === "success" ? "good" : "${{ needs.test.result }}" === "failure" ? "danger" : "warning",
-                title: "Details",
+                color: process.env.AS_JOB_STATUS === "success" ? "good" : process.env.AS_JOB_STATUS === "failure" ? "danger" : "warning",
+                title: process.env.AS_JOB_STATUS === "success" ? "✅ All tests passed" : "❌ Tests failed",
+                fields: [
+                  {
+                    title: "Repository",
+                    value: "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>",
+                    short: true
+                  },
+                  {
+                    title: "Message",
+                    value: github.event_name === "pull_request"
+                        ? "<${{ github.event.pull_request.html_url }}|PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}>"
+                        : (process.env.AS_MESSAGE ? process.env.AS_MESSAGE.split('\n')[0] : "No message"),
+                    short: true
+                  },
+                  {
+                    title: "Commit",
+                    value: "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|" + "${{ github.sha }}".substring(0, 7) + ">",
+                    short: true
+                  },
+                  {
+                    title: "Author",
+                    value: "${{ github.actor }}",
+                    short: true
+                  },
+                  {
+                    title: "Duration",
+                    value: "${{ needs.test.outputs.duration }}",
+                    short: true
+                  },
+                  {
+                    title: "Status",
+                    value: "${{ needs.test.result }}",
+                    short: true
+                  },
+                  {
+                    title: "Branch/Ref",
+                    value: "${{ github.ref }}",
+                    short: true
+                  },
+                  {
+                    title: "Workflow",
+                    value: "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>",
+                    short: true
+                  },
+                  {
+                    title: "Pull Request",
+                    value: "<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}>",
+                    short: false
+                  }
+                ],
+                footer: "GitHub Actions · ${{ github.workflow }}"
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - uses: 8398a7/action-slack@v3
+        if: github.event_name != 'pull_request'
+        with:
+          status: custom
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          custom_payload: |
+            {
+              text: "Push to ${{ github.ref_name }}",
+              attachments: [{
+                color: process.env.AS_JOB_STATUS === "success" ? "good" : process.env.AS_JOB_STATUS === "failure" ? "danger" : "warning",
+                title: process.env.AS_JOB_STATUS === "success" ? "✅ All tests passed" : "❌ Tests failed",
                 fields: [
                   {
                     title: "Repository",
@@ -125,4 +192,3 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: always()
