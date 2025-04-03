@@ -7,63 +7,34 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
-      install-dependencies: ${{ steps.install-dependencies.outputs.result }}
-
+      coverage: ${{ steps.coverage.outputs.report }}
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: write
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Use coverage code
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        id: coverage
         with:
-          node-version: 20.x
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+          output: comment, report-markdown
+      - name: Add coverage comment
+        uses: marocchino/sticky-pull-request-comment@v2
         with:
-          version: 10.7.1
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install dependencies
-        id: install-dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Build
-        run: pnpm build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
+          message: ${{ steps.coverage.outputs.report }}
 
   send-pull-request-result-to-slack:
     permissions:
       contents: read
       actions: read
     runs-on: ubuntu-latest
-    needs: build
+    needs: test
     steps:
       - uses: 8398a7/action-slack@v3
         with:
@@ -72,17 +43,17 @@ jobs:
           custom_payload: |
             {
                   attachments: [{
-                          color: '${{ needs.build.result}}' === 'success' ? 'good' : '${{ needs.build.result}}' === 'failure' ? 'danger' : 'warning',
+                          color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result}}' === 'failure' ? 'danger' : 'warning',
                           title: 'Pull Request Result',
-                          text: '${{ needs.build.result}}' === 'success' ? 'Succeeded' : 'Failed',
+                          text: '${{ needs.test.result}}' === 'success' ? 'Succeeded' : 'Failed',
                           fields: [
                               {
                                   title: 'Result',
-                                  value: '${{ needs.build.result }}'
+                                  value: '${{ needs.test.result }}'
                               },
                               {
-                                  title: 'Install Dependencies',
-                                  value: '${{ needs.build.outputs.install-dependencies }}',
+                                  title: 'Coverage',
+                                  value: '${{ needs.test.outputs.coverage }}'.toString(),
                                   short: false
                               }
                           ]
