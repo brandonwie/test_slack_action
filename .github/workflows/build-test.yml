@@ -73,43 +73,43 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
-              "text": "Build Report: ${{ github.repository }}",
-              "attachments": [{
-                "color": "good",
-                "title": "Build Results",
-                "fields": [
+              text: "Build Report: ${{ github.repository }}",
+              attachments: [{
+                color: "good",
+                title: "Build Results",
+                fields: [
                   {
-                    "title": "Repository",
-                    "value": "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>",
-                    "short": true
+                    title: "Repository",
+                    value: "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>",
+                    short: true
                   },
                   {
-                    "title": "Commit",
-                    "value": "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{'$'}}{{ github.sha.substring(0, 7) }}>",
-                    "short": true
+                    title: "Commit",
+                    value: "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|" + "${{ github.sha }}".substring(0, 7) + ">",
+                    short: true
                   },
                   {
-                    "title": "Author",
-                    "value": "${{ github.actor }}",
-                    "short": true
+                    title: "Author",
+                    value: "${{ github.actor }}",
+                    short: true
                   },
                   {
-                    "title": "Duration",
-                    "value": "${{ needs.test.outputs.duration }}",
-                    "short": true
+                    title: "Duration",
+                    value: "${{ needs.test.outputs.duration }}",
+                    short: true
                   },
                   {
-                    "title": "Branch/Ref",
-                    "value": "${{ github.ref }}",
-                    "short": true
+                    title: "Branch/Ref",
+                    value: "${{ github.ref }}",
+                    short: true
                   },
                   {
-                    "title": "Workflow",
-                    "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>",
-                    "short": true
+                    title: "Workflow",
+                    value: "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>",
+                    short: true
                   }
                 ],
-                "footer": "GitHub Actions · ${{ github.workflow }}"
+                footer: "GitHub Actions · ${{ github.workflow }}"
               }]
             }
         env:
