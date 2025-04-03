@@ -52,7 +52,7 @@ jobs:
                 text: 'Succeeded',
                 fields: [{
                   title: 'lower case',
-                  value: '${{ needs.test.result }}'.toLowerCase(),
+                  value: JSON.stringify(${{ needs.test.outputs.coverage }}),
                   short: true
                 },
                 {
