@@ -20,16 +20,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use coverage code
-        uses: ArtiomTr/jest-coverage-report-action@v2
+      - name: Jest Coverage Report
         id: coverage
+        uses: ArtiomTr/jest-coverage-report-action@v2
         with:
-          output: comment, report-markdown
-
-      - name: Add coverage comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          message: ${{ steps.coverage.outputs.report }}
+          output: report-markdown
+          package-manager: npm
 
   slack:
     permissions:
@@ -37,39 +33,32 @@ jobs:
       actions: read
     runs-on: ubuntu-latest
     needs: test
+    if: always()
     steps:
       - uses: 8398a7/action-slack@v3
         with:
           status: custom
+          fields: repo,message,author,ref,pullRequest
           custom_payload: |
             {
-              text: "Custom Field Check",
               attachments: [{
-                "author_name": "8398a7@action-slack", // json
-                fallback: 'fallback',
-                color: 'good',
-                title: 'CI Result',
-                text: 'Succeeded',
-                fields: [{
-                  title: 'lower case',
-                  value: JSON.stringify(${{ needs.test.outputs.coverage }}),
-                  short: true
-                },
-                {
-                  title: 'reverse',
-                  value: 'gnirts esrever'.split('').reverse().join(''),
-                  short: true
-                },
-                {
-                  title: 'long title1',
-                  value: 'long value1',
-                  short: false
-                }],
-                actions: [{
-                }]
+                color: '${{needs.test.result}}' === 'success' ? 'good' : '${{needs.test.result}}' === 'failure' ? 'danger' : 'warning',
+                title: 'Pull Request Result',
+                text: '${{needs.test.result}}' === 'success' ? 'Succeeded' : 'Failed',
+                fields: [
+                  {
+                    title: 'Result',
+                    value: '${{needs.test.result}}'
+                  },
+                  {
+                    title: 'Coverage',
+                    value: '${{needs.test.outputs.coverage}}',
+                    short: false
+                  }
+                ]
               }]
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         # Pick up events even if the job fails or is canceled.
         if: always()
