@@ -86,8 +86,8 @@ jobs:
                     short: true
                   },
                   {
-                    title: "Message",
-                    value: process.env.AS_PULL_REQUEST ? "PR: " + process.env.AS_PULL_REQUEST : (process.env.AS_MESSAGE ? process.env.AS_MESSAGE.split('\n')[0] : "No message"),
+                    title: "Pull Request",
+                    value: process.env.AS_PULL_REQUEST ? process.env.AS_PULL_REQUEST : (process.env.AS_MESSAGE ? process.env.AS_MESSAGE.split('\n')[0] : "No message"),
                     short: true
                   },
                   {
