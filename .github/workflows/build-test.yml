@@ -69,17 +69,18 @@ jobs:
       - uses: 8398a7/action-slack@v3
         with:
           status: custom
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
                   text: "Pull Request on ${{ github.repository }}",
                   attachments: [{
                           title: 'GitHub Actions',
                           color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
-                          text: '${{ github.actor }}',
+                          text: '${{ needs.test.result}}' === 'success' ? 'Success' : '${{ needs.test.result }}' === 'failure' ? 'Failure' : 'Warning',
                           fields: [
                               {
                                 title: 'Branch',
-                                value: '${{ github.ref_name }}'
+                                value: '${{ github.event.pull_request.head.sha }}'
                               },
                               {
                                   title: 'Test Result',
@@ -95,7 +96,7 @@ jobs:
                               },
                               {
                                   title: 'Workflow',
-                                  value: '${{ github.workflow }}'
+                                  value: '${{ github.workflow_sha }}'
                               },
                               {
                                   title: 'Started At',
@@ -103,7 +104,8 @@ jobs:
                               },
                               {
                                   title: 'Message',
-                                  value: '${{ github.event.pull_request.body }}'
+                                  value: '${{ github.event.pull_request.body }}',
+                                  short: false
                               },
                           ]
                       },
