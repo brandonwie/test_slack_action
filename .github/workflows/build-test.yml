@@ -29,20 +29,32 @@ jobs:
 
       - name: Extract Coverage Summary
         id: extract_coverage
+        shell: python
         run: |
-          # Use a simpler extraction method focusing just on percentages
-          REPORT='${{ steps.coverage.outputs.report }}'
+          import os
+          import re
 
-          # Extract percentages using simpler approach
-          STATEMENTS=$(echo "$REPORT" | grep -o "Statements | [0-9]*%" | grep -o "[0-9]*")
-          BRANCHES=$(echo "$REPORT" | grep -o "Branches | [0-9]*%" | grep -o "[0-9]*")
-          FUNCTIONS=$(echo "$REPORT" | grep -o "Functions | [0-9]*%" | grep -o "[0-9]*")
-          LINES=$(echo "$REPORT" | grep -o "Lines | [0-9]*%" | grep -o "[0-9]*")
+          # Get the report from the environment
+          report = '''${{ steps.coverage.outputs.report }}'''
 
-          # Format summary
-          SUMMARY="📊 Coverage: Statements: ${STATEMENTS}%, Branches: ${BRANCHES}%, Functions: ${FUNCTIONS}%, Lines: ${LINES}%"
+          # Use regex to extract percentages
+          statements_match = re.search(r"Statements \| (\d+)%", report)
+          branches_match = re.search(r"Branches \| (\d+)%", report)
+          functions_match = re.search(r"Functions \| (\d+)%", report)
+          lines_match = re.search(r"Lines \| (\d+)%", report)
 
-          echo "coverage_summary=$SUMMARY" >> $GITHUB_OUTPUT
+          # Get the percentages
+          statements = statements_match.group(1) if statements_match else "N/A"
+          branches = branches_match.group(1) if branches_match else "N/A"
+          functions = functions_match.group(1) if functions_match else "N/A"
+          lines = lines_match.group(1) if lines_match else "N/A"
+
+          # Create summary
+          summary = f"📊 Coverage: Statements: {statements}%, Branches: {branches}%, Functions: {functions}%, Lines: {lines}%"
+
+          # Write to GitHub output
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write(f"coverage_summary={summary}\n")
 
   slack:
     permissions:
