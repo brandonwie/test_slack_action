@@ -49,9 +49,8 @@ jobs:
                     value: '${{needs.test.result}}'
                   },
                   {
-                    title: 'Coverage',
+                    title: 'Coverage Report',
                     value: '${{needs.test.outputs.coverage}}',
-                    short: false
                   }
                 ]
               }]
