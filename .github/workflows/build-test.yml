@@ -79,32 +79,37 @@ jobs:
                           text: '${{ needs.test.result}}' === 'success' ? 'Success' : '${{ needs.test.result }}' === 'failure' ? 'Failure' : 'Warning',
                           fields: [
                               {
-                                title: 'Branch',
-                                value: '${{ github.event.pull_request.head.sha }}'
+                                  title: 'github.event.pull_request.url',
+                                  value: '${{ github.event.pull_request.url }}'
                               },
                               {
-                                  title: 'Test Result',
+                                  title: 'needs.test.result',
                                   value: '${{ needs.test.result }}'
                               },
                               {
-                                  title: 'Duration',
+                                  title: 'needs.test.outputs.duration',
                                   value: '${{ needs.test.outputs.duration }}'
                               },
                               {
-                                  title: 'Commit',
-                                  text: '${{ github.sha }}'
+                                  title: 'github.event.pull_request.commits_url',
+                                  text: '${{ github.event.pull_request.commits_url }}'
                               },
                               {
-                                  title: 'Workflow',
-                                  value: '${{ github.workflow_sha }}'
+                                  title: 'github.workflow_ref',
+                                  value: '${{ github.workflow_ref }}'
                               },
                               {
-                                  title: 'Started At',
-                                  value: '${{ needs.test.outputs.started_at }}'
+                                  title: 'github.event.pull_request.body',
+                                  value: '${{ github.event.pull_request.body }}'
                               },
                               {
-                                  title: 'Message',
-                                  value: '${{ github.event.pull_request.body }}',
+                                  title: 'github.event.pull_request.commits_url',
+                                  value: '${{ github.event.pull_request.commits_url }}',
+                                  short: false
+                              },
+                              {
+                                  title: 'github.event.pull_request.user.email',
+                                  value: '${{ github.event.pull_request.user.email }}',
                                   short: false
                               },
                           ]
