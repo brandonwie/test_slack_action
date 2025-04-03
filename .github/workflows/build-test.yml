@@ -33,6 +33,10 @@ jobs:
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           output: report-markdown
+      - name: Add coverage comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: ${{ steps.coverage.outputs.report }}
 
       - name: Record end time
         id: end_time
