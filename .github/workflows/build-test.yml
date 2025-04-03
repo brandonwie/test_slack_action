@@ -30,16 +30,19 @@ jobs:
       - name: Extract Coverage Summary
         id: extract_coverage
         run: |
-          REPORT="${{ steps.coverage.outputs.report }}"
-          # Extract lines after "## Coverage" and before the next section
-          SUMMARY=$(echo "$REPORT" | sed -n '/^## Coverage/,/^##/p' | grep -v '^##')
-          # Remove HTML comments
-          SUMMARY=$(echo "$SUMMARY" | grep -v '<!--')
-          # Trim whitespace
-          SUMMARY=$(echo "$SUMMARY" | awk '{$1=$1};1')
-          echo "coverage_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$SUMMARY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          # Use a simpler extraction method focusing just on percentages
+          REPORT='${{ steps.coverage.outputs.report }}'
+
+          # Extract percentages using simpler approach
+          STATEMENTS=$(echo "$REPORT" | grep -o "Statements | [0-9]*%" | grep -o "[0-9]*")
+          BRANCHES=$(echo "$REPORT" | grep -o "Branches | [0-9]*%" | grep -o "[0-9]*")
+          FUNCTIONS=$(echo "$REPORT" | grep -o "Functions | [0-9]*%" | grep -o "[0-9]*")
+          LINES=$(echo "$REPORT" | grep -o "Lines | [0-9]*%" | grep -o "[0-9]*")
+
+          # Format summary
+          SUMMARY="📊 Coverage: Statements: ${STATEMENTS}%, Branches: ${BRANCHES}%, Functions: ${FUNCTIONS}%, Lines: ${LINES}%"
+
+          echo "coverage_summary=$SUMMARY" >> $GITHUB_OUTPUT
 
   slack:
     permissions:
