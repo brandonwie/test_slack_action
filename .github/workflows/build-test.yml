@@ -62,8 +62,6 @@ jobs:
     permissions:
       contents: read
       actions: read
-    # Only run if event is the `pull_request_target`
-    if: ${{ github.event_name == 'pull_request_target' }}
     runs-on: ubuntu-latest
     needs: build
     steps:
