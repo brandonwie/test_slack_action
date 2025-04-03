@@ -19,13 +19,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Jest Coverage Report
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           output: report-markdown
-          package-manager: npm
 
   slack:
     permissions:
