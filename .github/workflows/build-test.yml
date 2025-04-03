@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      install-dependencies: ${{ steps.install-dependencies.outputs.result }}
 
     steps:
       - name: Checkout code
@@ -40,6 +42,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
+        id: install-dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint
@@ -54,3 +57,40 @@ jobs:
           name: dist
           path: dist/
           retention-days: 7
+
+  send-pull-request-result-to-slack:
+    permissions:
+      contents: read
+      actions: read
+    # Only run if event is the `pull_request_target`
+    if: ${{ github.event_name == 'pull_request_target' }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: repo,message,author,ref,pullRequest
+          custom_payload: |
+            {
+                  attachments: [{
+                          color: '${{ needs.build.result}}' === 'success' ? 'good' : '${{ needs.build.result}}' === 'failure' ? 'danger' : 'warning',
+                          title: 'Pull Request Result',
+                          text: '${{ needs.build.result}}' === 'success' ? 'Succeeded' : 'Failed',
+                          fields: [
+                              {
+                                  title: 'Result',
+                                  value: '${{ needs.build.result }}'
+                              },
+                              {
+                                  title: 'Install Dependencies',
+                                  value: '${{ needs.build.outputs.install-dependencies }}',
+                                  short: false
+                              }
+                          ]
+                  }]
+              }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        # Pick up events even if the job fails or is canceled.
+        if: always()
