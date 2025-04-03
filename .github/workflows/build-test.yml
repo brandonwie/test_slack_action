@@ -14,6 +14,7 @@ jobs:
       started_at: ${{ steps.start_time.outputs.time }}
       ended_at: ${{ steps.end_time.outputs.time }}
       duration: ${{ steps.duration.outputs.time }}
+      result: ${{ job.status }}
     permissions:
       checks: write
       pull-requests: write
@@ -73,10 +74,10 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
           custom_payload: |
             {
-              text: "Pull request on: ${{ github.repository }}",
+              text: "Pull request is ready for review on `${{ github.repository }}`",
               attachments: [{
-                color: "good",
-                title: "Build Results",
+                color: "${{ needs.test.result }}" === "success" ? "good" : "${{ needs.test.result }}" === "failure" ? "danger" : "warning",
+                title: "Details",
                 fields: [
                   {
                     title: "Repository",
@@ -101,6 +102,11 @@ jobs:
                   {
                     title: "Duration",
                     value: "${{ needs.test.outputs.duration }}",
+                    short: true
+                  },
+                  {
+                    title: "Status",
+                    value: "${{ needs.test.result }}",
                     short: true
                   },
                   {
