@@ -11,7 +11,8 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     outputs:
-      coverage: ${{ steps.coverage.outputs.report }}
+      coverage: ${{ steps.extract_coverage.outputs.coverage_summary }}
+      result: ${{ job.status }}
     permissions:
       checks: write
       pull-requests: write
@@ -19,18 +20,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Jest Coverage Report
         id: coverage
         uses: ArtiomTr/jest-coverage-report-action@v2
         with:
           output: report-markdown
-      - name: Debug Coverage Output
+
+      - name: Extract Coverage Summary
+        id: extract_coverage
         run: |
-          echo "Coverage report type: $(typeof '${{ steps.coverage.outputs.report }}')"
-          echo "Coverage report length: ${#COVERAGE_REPORT}"
-          echo "First 100 chars: ${COVERAGE_REPORT:0:100}"
-        env:
-          COVERAGE_REPORT: ${{ steps.coverage.outputs.report }}
+          REPORT="${{ steps.coverage.outputs.report }}"
+          # Extract lines after "## Coverage" and before the next section
+          SUMMARY=$(echo "$REPORT" | sed -n '/^## Coverage/,/^##/p' | grep -v '^##')
+          # Remove HTML comments
+          SUMMARY=$(echo "$SUMMARY" | grep -v '<!--')
+          # Trim whitespace
+          SUMMARY=$(echo "$SUMMARY" | awk '{$1=$1};1')
+          echo "coverage_summary<<EOF" >> $GITHUB_OUTPUT
+          echo "$SUMMARY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
   slack:
     permissions:
@@ -49,11 +58,16 @@ jobs:
               attachments: [{
                 color: '${{needs.test.result}}' === 'success' ? 'good' : '${{needs.test.result}}' === 'failure' ? 'danger' : 'warning',
                 title: 'Pull Request Result',
-                text: '${{needs.test.result}}' === 'success' ? 'Succeeded' : 'Failed',
+                text: '${{needs.test.result}}' === 'success' ? 'Test Coverage Report' : 'Tests Failed',
                 fields: [
                   {
                     title: 'Result',
                     value: '${{needs.test.result}}'
+                  },
+                  {
+                    title: 'Coverage Summary',
+                    value: '${{needs.test.outputs.coverage}}',
+                    short: false
                   }
                 ]
               }]
