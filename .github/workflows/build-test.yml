@@ -72,9 +72,9 @@ jobs:
           custom_payload: |
             {
                   text: "Pull Request on ${{ github.repository }}",
-                  color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
                   attachments: [{
-                          title: 'Author',
+                          title: 'GitHub Actions',
+                          color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
                           text: '${{ github.actor }}',
                           fields: [
                               {
