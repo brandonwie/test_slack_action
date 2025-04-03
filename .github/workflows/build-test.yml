@@ -81,36 +81,42 @@ jobs:
                               {
                                   title: 'github.event.pull_request.url',
                                   value: '${{ github.event.pull_request.url }}'
+                                  short: true,
                               },
                               {
                                   title: 'needs.test.result',
                                   value: '${{ needs.test.result }}'
+                                  short: true,
                               },
                               {
                                   title: 'needs.test.outputs.duration',
                                   value: '${{ needs.test.outputs.duration }}'
+                                  short: true,
                               },
                               {
                                   title: 'github.event.pull_request.commits_url',
                                   text: '${{ github.event.pull_request.commits_url }}'
+                                  short: true,
                               },
                               {
                                   title: 'github.workflow_ref',
                                   value: '${{ github.workflow_ref }}'
+                                  short: true,
                               },
                               {
                                   title: 'github.event.pull_request.body',
                                   value: '${{ github.event.pull_request.body }}'
+                                  short: true
                               },
                               {
                                   title: 'github.event.pull_request.commits_url',
                                   value: '${{ github.event.pull_request.commits_url }}',
-                                  short: false
+                                  short: true
                               },
                               {
                                   title: 'github.event.pull_request.user.email',
                                   value: '${{ github.event.pull_request.user.email }}',
-                                  short: false
+                                  short: true
                               },
                           ]
                       }
