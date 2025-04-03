@@ -31,15 +31,17 @@ jobs:
         id: extract_coverage
         run: |
           REPORT="${{ steps.coverage.outputs.report }}"
-          # Extract lines after "## Coverage" and before the next section
-          SUMMARY=$(echo "$REPORT" | sed -n '/^## Coverage/,/^##/p' | grep -v '^##')
-          # Remove HTML comments
-          SUMMARY=$(echo "$SUMMARY" | grep -v '<!--')
-          # Trim whitespace
-          SUMMARY=$(echo "$SUMMARY" | awk '{$1=$1};1')
-          echo "coverage_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$SUMMARY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Extract just the key coverage percentages for a simpler Slack message
+          STATEMENTS=$(echo "$REPORT" | grep "Statements" | sed -E 's/.*\| ([0-9]+)% \|.*/\1/')
+          BRANCHES=$(echo "$REPORT" | grep "Branches" | sed -E 's/.*\| ([0-9]+)% \|.*/\1/')
+          FUNCTIONS=$(echo "$REPORT" | grep "Functions" | sed -E 's/.*\| ([0-9]+)% \|.*/\1/')
+          LINES=$(echo "$REPORT" | grep "Lines" | sed -E 's/.*\| ([0-9]+)% \|.*/\1/')
+
+          # Format for Slack
+          SUMMARY="Statements: ${STATEMENTS}%, Branches: ${BRANCHES}%, Functions: ${FUNCTIONS}%, Lines: ${LINES}%"
+
+          echo "coverage_summary=$SUMMARY" >> $GITHUB_OUTPUT
 
   slack:
     permissions:
