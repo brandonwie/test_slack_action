@@ -79,13 +79,13 @@ jobs:
                 "title": "Build Results",
                 "fields": [
                   {
-                    "title": "Repository URL",
-                    "value": "${{ github.server_url }}/${{ github.repository }}",
+                    "title": "Repository",
+                    "value": "<${{ github.server_url }}/${{ github.repository }}|${{ github.repository }}>",
                     "short": true
                   },
                   {
                     "title": "Commit",
-                    "value": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+                    "value": "<${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{'$'}}{{ github.sha.substring(0, 7) }}>",
                     "short": true
                   },
                   {
@@ -104,8 +104,8 @@ jobs:
                     "short": true
                   },
                   {
-                    "title": "Workflow URL",
-                    "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                    "title": "Workflow",
+                    "value": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>",
                     "short": true
                   }
                 ],
