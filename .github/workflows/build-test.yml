@@ -72,7 +72,6 @@ jobs:
           custom_payload: |
             {
                   text: "Pull Request on ${{ github.repository }}",
-                  icon_emoji: '${{ needs.test.result }}' === 'success' ? ':white_check_mark:' : ':x:',
                   color: '${{ needs.test.result}}' === 'success' ? 'good' : '${{ needs.test.result }}' === 'failure' ? 'danger' : 'warning',
                   attachments: [{
                           title: 'Author',
