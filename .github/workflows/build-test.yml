@@ -108,11 +108,6 @@ jobs:
                                   short: false
                               },
                           ]
-                      },
-                      {
-                          title: 'Message',
-                          text: '${{ github.event.pull_request.body }}',
-                          short: true
                       }
                   ]
               }
