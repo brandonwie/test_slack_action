@@ -24,6 +24,10 @@ jobs:
         id: coverage
         with:
           output: comment, report-markdown
+      - name: Add coverage comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: ${{ steps.coverage.outputs.report }}
 
   send-pull-request-result-to-slack:
     permissions:
