@@ -103,7 +103,11 @@ jobs:
                               {
                                   title: 'Started At',
                                   value: '${{ needs.test.outputs.started_at }}'
-                              }
+                              },
+                              {
+                                  title: 'Message',
+                                  value: '${{ github.event.pull_request.body }}'
+                              },
                           ]
                       },
                       {
