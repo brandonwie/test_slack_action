@@ -26,11 +26,6 @@ describe("Utils", () => {
     it("should handle decimal numbers", () => {
       expect(add(0.1, 0.2)).toBeCloseTo(0.3);
     });
-
-    // Failing test
-    it("FAILING TEST: should fail on purpose", () => {
-      expect(add(2, 2)).toBe(5); // 2+2=4, not 5
-    });
   });
 
   describe("multiply", () => {
