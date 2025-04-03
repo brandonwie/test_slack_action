@@ -48,10 +48,6 @@ jobs:
                     title: 'Result',
                     value: '${{needs.test.result}}'
                   },
-                  {
-                    title: 'Coverage Report',
-                    value: '${{needs.test.outputs.coverage}}',
-                  }
                 ]
               }]
             }
